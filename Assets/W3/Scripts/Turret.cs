@@ -2,51 +2,38 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour
 {
-    [Header ("Prefabs")]
+    [Header ("Reference")]
     public Transform player;
     public GameObject bullet;
     public GameObject firePoint;
 
-    [Header("Area Sensors")]
-    public float detectionRange = 10f;
-    public float fireAngle = 10f;
 
-    [Header("Rotation")]
-    public float turnSpeed = 180f;
+    public float detectionRange;
 
-    [Header("Firing")]
-    public float fireCooldown = 1.5f;
 
-    private float fireTimer;
+    void TurretRotation(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
 
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+    }
 
     void Update()
     {
-        if (!player) return;
-
-        fireTimer -= Time.deltaTime;
-
-        Vector3 towardsPlayer = player.position - transform.position;
-        towardsPlayer.y = 0f;
-
-        float distance = towardsPlayer.magnitude;
-        if (distance > detectionRange)
-        {
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(towardsPlayer);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
-
-        float angle = Vector3.Angle(transform.forward, towardsPlayer);
-
-
+        TurretRotation(player.position);
     }
 
-    void Fire()
+    public void TurretDetection()
     {
-        GameObject projectile = Instantiate(bullet, firePoint.position, firePoint.rotation);
-        projectile.GetComponent<bullet>().direction = firePoint.forward;
+        Vector3 direction = player.position - transform.position;
+        float distance = direction.magnitude;
+
+        if(distance < detectionRange)
+        {
+            
+        }
     }
 
 }
