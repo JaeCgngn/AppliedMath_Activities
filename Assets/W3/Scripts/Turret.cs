@@ -2,51 +2,96 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour
 {
-    [Header ("Prefabs")]
+    [Header("References")]
     public Transform player;
-    public GameObject bullet;
-    public GameObject firePoint;
 
-    [Header("Area Sensors")]
-    public float detectionRange = 10f;
-    public float fireAngle = 10f;
+    public Shooting shootingScript;
 
     [Header("Rotation")]
     public float turnSpeed = 180f;
 
-    [Header("Firing")]
-    public float fireCooldown = 1.5f;
+    [Header("Detection")]
 
-    private float fireTimer;
+    public float detectionRange = 2f;
+
+    public bool playerInRange = false;
+    private Coroutine fireCoroutine;
 
 
     void Update()
     {
-        if (!player) return;
 
-        fireTimer -= Time.deltaTime;
+        //TurretRotation(player.position);
+        TurretDetection();
 
-        Vector3 towardsPlayer = player.position - transform.position;
-        towardsPlayer.y = 0f;
+    }
 
-        float distance = towardsPlayer.magnitude;
-        if (distance > detectionRange)
+    public void TurretRotation(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - transform.position;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+    }
+
+    public void TurretDetection()
+    {
+
+        // Check if player is within detection range
+
+        Vector3 direction = player.position - transform.position; // Vector from turret to player
+        float distance = direction.magnitude; // Calculate distance
+
+        if (distance < detectionRange) // Adjust detection range as needed
         {
-            return;
+
+
+            if (!playerInRange)
+
+                playerInRange = true;
+            TurretRotation(player.position);
+
+            if (fireCoroutine == null)
+            {
+                fireCoroutine = StartCoroutine(shootingScript.FireRoutine());
+
+                Debug.Log("Starts Firing");
+            }
+
+            Debug.Log("Turret Detection Active");
+
         }
 
-        Quaternion targetRotation = Quaternion.LookRotation(towardsPlayer);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+        else
+        {
+            if (playerInRange)
+            {
+                playerInRange = false;
 
-        float angle = Vector3.Angle(transform.forward, towardsPlayer);
+                if (fireCoroutine != null)
+                {
+                    StopCoroutine(fireCoroutine);
+                    fireCoroutine = null;
+
+                    Debug.Log("Stops Firing");
+                }
+
+                Debug.Log("Turret Detection Inactive");
+
+            }
+        }
 
 
     }
 
-    void Fire()
+    void OnDrawGizmos()
     {
-        GameObject projectile = Instantiate(bullet, firePoint.position, firePoint.rotation);
-        projectile.GetComponent<bullet>().direction = firePoint.forward;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
+
+
 
 }
