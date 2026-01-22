@@ -19,6 +19,71 @@ public class Turret : MonoBehaviour
 
     public float viewAngle = 45f;
 
+    [Header("Renderer")]
+
+    public float viewDistance = 5f;
+    public LineRenderer rightLine;
+    public LineRenderer leftLine;
+
+    public LineRenderer coneLine;
+
+    public bool showLines = true;
+
+    public int segments = 20;
+
+    void Start()
+    {
+
+        CreateLineRenderers();
+    }
+
+    void CreateLineRenderers()
+    {
+        if (rightLine == null)
+        {
+            GameObject rightObj = new GameObject("RightLine");
+            rightObj.transform.parent = transform;
+            rightLine = rightObj.AddComponent<LineRenderer>();
+            rightLine.positionCount = 2;
+            rightLine.useWorldSpace = true;
+            rightLine.material = new Material(Shader.Find("Sprites/Default"));
+            rightLine.startColor = Color.yellow;
+            rightLine.endColor = Color.yellow;
+
+            rightLine.startWidth = 0.05f;
+            rightLine.endWidth = 0.05f;
+        }
+
+        if (leftLine == null)
+        {
+            GameObject leftObj = new GameObject("LeftLine");
+            leftObj.transform.parent = transform;
+            leftLine = leftObj.AddComponent<LineRenderer>();
+            leftLine.positionCount = 2;
+            leftLine.useWorldSpace = true;
+            leftLine.material = new Material(Shader.Find("Sprites/Default"));
+            leftLine.startColor = Color.yellow;
+            leftLine.endColor = Color.yellow;
+
+            leftLine.startWidth = 0.05f;
+            leftLine.endWidth = 0.05f;
+        }
+
+        if (coneLine == null)
+        {
+            GameObject coneObj = new GameObject("ConeLine");
+            coneObj.transform.parent = transform;
+            coneLine = coneObj.AddComponent<LineRenderer>();
+            coneLine.positionCount = segments + 1;
+            coneLine.useWorldSpace = true;
+            coneLine.material = new Material(Shader.Find("Sprites/Default"));
+            coneLine.startColor = Color.yellow;
+            coneLine.endColor = Color.yellow;
+
+            coneLine.startWidth = 0.05f;
+            coneLine.endWidth = 0.05f;
+        }
+    }
 
 
     void Update()
@@ -26,9 +91,13 @@ public class Turret : MonoBehaviour
 
         //TurretRotation(player.position);
         TurretDetection();
+        DrawLines();
+        DrawCone();
+        ToggleLines();
 
 
     }
+
 
     public void TurretRotation(Vector3 targetPosition)
     {
@@ -116,6 +185,44 @@ public class Turret : MonoBehaviour
 
     }
 
+
+    void ToggleLines()
+    {
+        if (rightLine != null) rightLine.enabled = showLines;
+        if (leftLine != null) leftLine.enabled = showLines;
+        if (coneLine != null) coneLine.enabled = showLines;
+    }
+
+    void DrawLines()
+    {
+
+        if (!showLines) return;
+
+        Vector3 rightBoundary = Quaternion.Euler(0, 0, viewAngle / 2f) * transform.right;
+        Vector3 leftBoundary = Quaternion.Euler(0, 0, -viewAngle / 2f) * transform.right;
+
+        rightLine.SetPosition(0, transform.position);
+        rightLine.SetPosition(1, transform.position + rightBoundary * detectionRange);
+
+        leftLine.SetPosition(0, transform.position);
+        leftLine.SetPosition(1, transform.position + leftBoundary * detectionRange);
+    }
+
+    void DrawCone()
+    {
+        if (!showLines || coneLine == null) return;
+
+        coneLine.positionCount = segments + 1;
+        float angleStep = viewAngle / segments;
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = -viewAngle / 2 + angleStep * i;
+            Vector3 dir = Quaternion.Euler(0, 0, angle) * transform.right;
+
+            coneLine.SetPosition(i, transform.position + dir * detectionRange);
+        }
+    }
 
 
 

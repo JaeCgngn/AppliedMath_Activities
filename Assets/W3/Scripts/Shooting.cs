@@ -8,13 +8,14 @@ public class Shooting : MonoBehaviour
     public GameObject bulletPrefab;
     public Transform firePoint;
 
-
-
-
-
     [Header("Shooter Settings")]
-
     public float fireRate = 1f;
+
+    [Header("Spread Settings")]
+    public int bulletsPerShot = 1;      // Number of bullets fired each time
+    public float spreadAngle = 10f;
+
+
 
     void Start()
     {
@@ -39,18 +40,22 @@ public class Shooting : MonoBehaviour
 
     void FireBullet()
     {
-
         Debug.Log("Bullet Fired");
 
-        // Use firePoint's world position and rotation
-        GameObject bullet = Instantiate(
-        bulletPrefab,
-        firePoint.position,       // world position
-        firePoint.rotation        // world rotation
-    );
+        for (int i = 0; i < bulletsPerShot; i++)
+        {
+            // Calculate random spread angle
+            float randomAngle = Random.Range(-spreadAngle / 2f, spreadAngle / 2f);
 
-        // Optional: parent the bullet to nothing, just to be safe
-        bullet.transform.parent = null;
+            // Apply spread to rotation
+            Quaternion spreadRotation = firePoint.rotation * Quaternion.Euler(0, 0, randomAngle);
+
+            Instantiate(
+                bulletPrefab,
+                firePoint.position,
+                spreadRotation
+            );
+        }
     }
 
 }
