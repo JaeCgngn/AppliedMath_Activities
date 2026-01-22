@@ -16,7 +16,7 @@ public class W3Shooting : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(FireRoutine());
+        StartCoroutine(FireRoutine()); 
     }
 
     IEnumerator FireRoutine()
@@ -26,13 +26,12 @@ public class W3Shooting : MonoBehaviour
         while (true)
         {
             FireBullet();
-            yield return new WaitForSeconds(fireRate); // 1 second
+            yield return new WaitForSeconds(fireRate); 
         }
     }
 
     void FireBullet()
     {
-
         Debug.Log("Bullet Fired");
         Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
     }

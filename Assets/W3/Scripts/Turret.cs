@@ -27,7 +27,7 @@ public class Turret : MonoBehaviour
 
     public void TurretDetection()
     {
-        Vector3 direction = player.position - transform.position;
+        Vector3 direction = player.position - transform.position; 
         float distance = direction.magnitude;
 
         if(distance < detectionRange)

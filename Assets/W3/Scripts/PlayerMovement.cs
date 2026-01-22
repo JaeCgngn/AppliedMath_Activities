@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -33,5 +34,10 @@ public class PlayerMovement : MonoBehaviour
 
         transform.position += dir * speed * Time.deltaTime;
 
+    }
+
+    public void PlayerDie()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
