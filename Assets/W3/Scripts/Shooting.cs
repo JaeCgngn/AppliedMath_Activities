@@ -10,6 +10,8 @@ public class Shooting : MonoBehaviour
 
 
 
+
+
     [Header("Shooter Settings")]
 
     public float fireRate = 1f;
@@ -20,6 +22,8 @@ public class Shooting : MonoBehaviour
         //  StartCoroutine(FireRoutine());
 
     }
+
+
 
 
     public IEnumerator FireRoutine()
